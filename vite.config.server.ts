@@ -32,6 +32,12 @@ export default defineConfig({
         // External dependencies that should not be bundled
         "express",
         "cors",
+        "joi",
+        "mysql2",
+        "bcryptjs",
+        "jsonwebtoken",
+        "uuid",
+        "dotenv",
       ],
       output: {
         format: "es",
