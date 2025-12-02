@@ -245,13 +245,13 @@ router.get(
 // Update Payment Status
 router.put(
   '/payment/:orderId',
-  validateRequest(paymentStatusSchema),
   (async (req, res) => {
     try {
       const { orderId } = req.params;
       const { status } = req.body;
 
-      if (!['success', 'failed'].includes(status)) {
+      // Validate status
+      if (!status || !['success', 'failed'].includes(status)) {
         return res.status(400).json({ success: false, message: 'Invalid payment status' });
       }
 
