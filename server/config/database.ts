@@ -116,6 +116,31 @@ export async function initializeDatabase() {
       )
     `);
 
+    // Insert default coupons if they don't exist
+    const [existingCoupons] = await connection.execute('SELECT COUNT(*) as count FROM coupons');
+    const couponCount = (existingCoupons as any[])[0].count;
+
+    if (couponCount === 0) {
+      const { v4: uuidv4 } = await import('uuid');
+
+      const defaultCoupons = [
+        { code: 'WELCOME10', discount: 10, valid_days: 30 },
+        { code: 'SAVE20', discount: 20, valid_days: 7 },
+        { code: 'SUMMER15', discount: 15, valid_days: 30 },
+      ];
+
+      for (const coupon of defaultCoupons) {
+        const couponId = uuidv4();
+        const validUntil = new Date(Date.now() + coupon.valid_days * 24 * 60 * 60 * 1000);
+        await connection.execute(
+          'INSERT INTO coupons (id, code, discount_percent, valid_until) VALUES (?, ?, ?, ?)',
+          [couponId, coupon.code, coupon.discount, validUntil]
+        );
+      }
+
+      console.log('Default coupons created');
+    }
+
     console.log('Database tables initialized successfully');
   } finally {
     connection.release();
