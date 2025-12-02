@@ -3,7 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getCart, removeFromCart, getStoredUser, updateCartItem } from "@/lib/api";
+import {
+  getCart,
+  removeFromCart,
+  getStoredUser,
+  updateCartItem,
+} from "@/lib/api";
 import { ArrowLeft, Loader2, Trash2, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
@@ -45,7 +50,7 @@ export default function Cart() {
   const handleRemove = async (itemId: string) => {
     try {
       await removeFromCart(itemId);
-      setItems(items.filter(item => item.id !== itemId));
+      setItems(items.filter((item) => item.id !== itemId));
       toast.success("Item removed from cart");
     } catch (error: any) {
       toast.error("Failed to remove item");
@@ -61,9 +66,11 @@ export default function Cart() {
     setUpdating(itemId);
     try {
       await updateCartItem(itemId, newQuantity);
-      setItems(items.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      ));
+      setItems(
+        items.map((item) =>
+          item.id === itemId ? { ...item, quantity: newQuantity } : item,
+        ),
+      );
       toast.success("Cart updated");
     } catch (error: any) {
       toast.error("Failed to update cart");
@@ -72,14 +79,20 @@ export default function Cart() {
     }
   };
 
-  const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
       <div className="bg-slate-900/50 backdrop-blur-md border-b border-slate-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <Link to="/products" className="flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <Link
+            to="/products"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-200"
+          >
             <ArrowLeft className="w-4 h-4" />
             Back to Products
           </Link>
@@ -99,7 +112,9 @@ export default function Cart() {
             <ShoppingCart className="w-16 h-16 text-slate-500 mx-auto mb-4" />
             <p className="text-slate-400 text-lg mb-4">Your cart is empty</p>
             <Link to="/products">
-              <Button className="bg-blue-500 hover:bg-blue-600">Continue Shopping</Button>
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                Continue Shopping
+              </Button>
             </Link>
           </div>
         ) : (
@@ -111,7 +126,9 @@ export default function Cart() {
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-1">
-                        <h3 className="text-white font-semibold">{item.name}</h3>
+                        <h3 className="text-white font-semibold">
+                          {item.name}
+                        </h3>
                         <p className="text-slate-400 text-sm">
                           Price: ${item.price.toFixed(2)}
                         </p>
@@ -125,7 +142,12 @@ export default function Cart() {
                             min="1"
                             max={item.stock}
                             value={item.quantity}
-                            onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value) || 1)}
+                            onChange={(e) =>
+                              handleUpdateQuantity(
+                                item.id,
+                                parseInt(e.target.value) || 1,
+                              )
+                            }
                             disabled={updating === item.id}
                             className="bg-slate-700 border-slate-600 text-white w-16"
                           />
@@ -172,7 +194,9 @@ export default function Cart() {
                 <div className="border-t border-slate-700 pt-4">
                   <div className="flex justify-between text-white font-bold text-lg">
                     <span>Total</span>
-                    <span className="text-blue-400">${totalPrice.toFixed(2)}</span>
+                    <span className="text-blue-400">
+                      ${totalPrice.toFixed(2)}
+                    </span>
                   </div>
                   <p className="text-slate-400 text-xs mt-2">
                     You can apply coupons and wallet points at checkout

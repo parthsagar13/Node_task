@@ -39,7 +39,10 @@ export default function SellerDashboard() {
     }
   };
 
-  const totalRevenue = products.reduce((sum, p) => sum + (p.price * (100 - p.stock)), 0);
+  const totalRevenue = products.reduce(
+    (sum, p) => sum + p.price * (100 - p.stock),
+    0,
+  );
   const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
 
   return (
@@ -47,7 +50,10 @@ export default function SellerDashboard() {
       {/* Header */}
       <div className="bg-slate-900/50 backdrop-blur-md border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-200"
+          >
             <ArrowLeft className="w-4 h-4" />
             Home
           </Link>
@@ -101,7 +107,9 @@ export default function SellerDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-lg font-bold text-cyan-400">{seller?.shop_name}</p>
+              <p className="text-lg font-bold text-cyan-400">
+                {seller?.shop_name}
+              </p>
             </CardContent>
           </Card>
 
@@ -112,7 +120,9 @@ export default function SellerDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm font-semibold text-slate-300">{seller?.email}</p>
+              <p className="text-sm font-semibold text-slate-300">
+                {seller?.email}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -150,7 +160,9 @@ export default function SellerDashboard() {
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white">{product.name}</h3>
+                      <h3 className="text-lg font-semibold text-white">
+                        {product.name}
+                      </h3>
                       <p className="text-slate-400 text-sm line-clamp-1 mb-3">
                         {product.description || "No description"}
                       </p>
@@ -163,13 +175,17 @@ export default function SellerDashboard() {
                         </div>
                         <div>
                           <p className="text-slate-400">Stock</p>
-                          <p className={`font-semibold ${product.stock > 10 ? "text-green-400" : product.stock > 0 ? "text-yellow-400" : "text-red-400"}`}>
+                          <p
+                            className={`font-semibold ${product.stock > 10 ? "text-green-400" : product.stock > 0 ? "text-yellow-400" : "text-red-400"}`}
+                          >
                             {product.stock} units
                           </p>
                         </div>
                         <div>
                           <p className="text-slate-400">ID</p>
-                          <p className="text-slate-300 text-xs">{product.id.slice(0, 8)}</p>
+                          <p className="text-slate-300 text-xs">
+                            {product.id.slice(0, 8)}
+                          </p>
                         </div>
                       </div>
                     </div>

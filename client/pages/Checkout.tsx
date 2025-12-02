@@ -75,7 +75,7 @@ export default function Checkout() {
     try {
       const orderData = await placeOrder(
         couponCode || undefined,
-        useWallet ? walletPoints : 0
+        useWallet ? walletPoints : 0,
       );
 
       // Simulate payment - in real app, would integrate with payment gateway
@@ -112,9 +112,13 @@ export default function Checkout() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Your cart is empty</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Your cart is empty
+          </h2>
           <Link to="/products">
-            <Button className="bg-blue-500 hover:bg-blue-600">Continue Shopping</Button>
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              Continue Shopping
+            </Button>
           </Link>
         </div>
       </div>
@@ -126,7 +130,10 @@ export default function Checkout() {
       {/* Header */}
       <div className="bg-slate-900/50 backdrop-blur-md border-b border-slate-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link to="/cart" className="flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <Link
+            to="/cart"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-200"
+          >
             <ArrowLeft className="w-4 h-4" />
             Back to Cart
           </Link>
@@ -148,11 +155,15 @@ export default function Checkout() {
               {/* Coupon Section */}
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="text-white">Apply Coupon Code</CardTitle>
+                  <CardTitle className="text-white">
+                    Apply Coupon Code
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="coupon" className="text-slate-300">Coupon Code</Label>
+                    <Label htmlFor="coupon" className="text-slate-300">
+                      Coupon Code
+                    </Label>
                     <div className="flex gap-2">
                       <Input
                         id="coupon"
@@ -181,13 +192,17 @@ export default function Checkout() {
               {/* Wallet Points Section */}
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="text-white">Use Wallet Points</CardTitle>
+                  <CardTitle className="text-white">
+                    Use Wallet Points
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-slate-300">Available Points</p>
-                      <p className="text-2xl font-bold text-yellow-400">{walletPoints}</p>
+                      <p className="text-2xl font-bold text-yellow-400">
+                        {walletPoints}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Checkbox
@@ -199,7 +214,10 @@ export default function Checkout() {
                           calculateCheckoutTotal(couponCode, points);
                         }}
                       />
-                      <Label htmlFor="wallet" className="text-slate-300 cursor-pointer">
+                      <Label
+                        htmlFor="wallet"
+                        className="text-slate-300 cursor-pointer"
+                      >
                         Use wallet points
                       </Label>
                     </div>
@@ -219,7 +237,8 @@ export default function Checkout() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-slate-400">
-                    Click "Complete Order" to proceed with payment simulation (90% success rate)
+                    Click "Complete Order" to proceed with payment simulation
+                    (90% success rate)
                   </p>
                 </CardContent>
               </Card>
@@ -254,7 +273,9 @@ export default function Checkout() {
                   <div className="border-t border-slate-700 pt-4">
                     <div className="flex justify-between text-white font-bold text-lg mb-4">
                       <span>Total</span>
-                      <span className="text-blue-400">${totals.total.toFixed(2)}</span>
+                      <span className="text-blue-400">
+                        ${totals.total.toFixed(2)}
+                      </span>
                     </div>
 
                     <Button

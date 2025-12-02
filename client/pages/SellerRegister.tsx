@@ -3,7 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { sellerRegister } from "@/lib/api";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -41,14 +47,19 @@ export default function SellerRegister() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-slate-200 mb-8">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-slate-400 hover:text-slate-200 mb-8"
+        >
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </Link>
 
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-white">Register Your Shop</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white">
+              Register Your Shop
+            </CardTitle>
             <CardDescription className="text-slate-400">
               Start selling on ShopHub today
             </CardDescription>
@@ -56,7 +67,9 @@ export default function SellerRegister() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-slate-300">Full Name</Label>
+                <Label htmlFor="name" className="text-slate-300">
+                  Full Name
+                </Label>
                 <Input
                   id="name"
                   type="text"
@@ -69,7 +82,9 @@ export default function SellerRegister() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-300">Email</Label>
+                <Label htmlFor="email" className="text-slate-300">
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -82,7 +97,9 @@ export default function SellerRegister() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="shop" className="text-slate-300">Shop Name</Label>
+                <Label htmlFor="shop" className="text-slate-300">
+                  Shop Name
+                </Label>
                 <Input
                   id="shop"
                   type="text"
@@ -95,7 +112,9 @@ export default function SellerRegister() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-300">Password</Label>
+                <Label htmlFor="password" className="text-slate-300">
+                  Password
+                </Label>
                 <Input
                   id="password"
                   type="password"
@@ -108,7 +127,9 @@ export default function SellerRegister() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirm" className="text-slate-300">Confirm Password</Label>
+                <Label htmlFor="confirm" className="text-slate-300">
+                  Confirm Password
+                </Label>
                 <Input
                   id="confirm"
                   type="password"
@@ -139,7 +160,10 @@ export default function SellerRegister() {
             <div className="mt-6 pt-6 border-t border-slate-700">
               <p className="text-sm text-slate-400">
                 Already have a seller account?{" "}
-                <Link to="/seller/login" className="text-cyan-400 hover:text-cyan-300">
+                <Link
+                  to="/seller/login"
+                  className="text-cyan-400 hover:text-cyan-300"
+                >
                   Sign in
                 </Link>
               </p>

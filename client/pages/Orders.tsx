@@ -74,7 +74,10 @@ export default function Orders() {
       {/* Header */}
       <div className="bg-slate-900/50 backdrop-blur-md border-b border-slate-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <Link to="/products" className="flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <Link
+            to="/products"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-200"
+          >
             <ArrowLeft className="w-4 h-4" />
             Back to Products
           </Link>
@@ -94,7 +97,9 @@ export default function Orders() {
             <ShoppingBag className="w-16 h-16 text-slate-500 mx-auto mb-4" />
             <p className="text-slate-400 text-lg mb-4">No orders yet</p>
             <Link to="/products">
-              <Button className="bg-blue-500 hover:bg-blue-600">Start Shopping</Button>
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                Start Shopping
+              </Button>
             </Link>
           </div>
         ) : (
@@ -106,20 +111,29 @@ export default function Orders() {
                     <div className="flex justify-between items-start gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-4 mb-3">
-                          <p className="text-white font-semibold">Order #{order.id.slice(0, 8)}</p>
-                          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBg(order.payment_status)} ${getStatusColor(order.payment_status)}`}>
+                          <p className="text-white font-semibold">
+                            Order #{order.id.slice(0, 8)}
+                          </p>
+                          <div
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBg(order.payment_status)} ${getStatusColor(order.payment_status)}`}
+                          >
                             {order.payment_status.toUpperCase()}
                           </div>
-                          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBg(order.order_status)} ${getStatusColor(order.order_status)}`}>
+                          <div
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBg(order.order_status)} ${getStatusColor(order.order_status)}`}
+                          >
                             {order.order_status.toUpperCase()}
                           </div>
                         </div>
                         <p className="text-slate-400 text-sm">
-                          {new Date(order.created_at).toLocaleDateString()} at {new Date(order.created_at).toLocaleTimeString()}
+                          {new Date(order.created_at).toLocaleDateString()} at{" "}
+                          {new Date(order.created_at).toLocaleTimeString()}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-slate-400 text-sm mb-1">Total Amount</p>
+                        <p className="text-slate-400 text-sm mb-1">
+                          Total Amount
+                        </p>
                         <p className="text-2xl font-bold text-blue-400">
                           ${order.total_price.toFixed(2)}
                         </p>

@@ -13,7 +13,10 @@ export default function Index() {
           </div>
           <div className="flex gap-4">
             <Link to="/user/login">
-              <Button variant="outline" className="border-slate-600 text-slate-200">
+              <Button
+                variant="outline"
+                className="border-slate-600 text-slate-200"
+              >
                 User Login
               </Button>
             </Link>
@@ -30,10 +33,14 @@ export default function Index() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
-            Welcome to <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">ShopHub</span>
+            Welcome to{" "}
+            <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              ShopHub
+            </span>
           </h1>
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            A complete e-commerce platform for buyers and sellers. Shop amazing products or sell your own.
+            A complete e-commerce platform for buyers and sellers. Shop amazing
+            products or sell your own.
           </p>
         </div>
 
@@ -43,9 +50,12 @@ export default function Index() {
             <div className="bg-blue-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
               <ShoppingCart className="w-6 h-6 text-blue-400" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-4">For Customers</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              For Customers
+            </h2>
             <p className="text-slate-400 mb-6">
-              Browse thousands of products, manage your cart, and checkout securely. Use wallet points and coupons for discounts.
+              Browse thousands of products, manage your cart, and checkout
+              securely. Use wallet points and coupons for discounts.
             </p>
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-2 text-slate-300">
@@ -68,7 +78,10 @@ export default function Index() {
                 </Button>
               </Link>
               <Link to="/user/login" className="flex-1">
-                <Button variant="outline" className="w-full border-slate-600 text-slate-200">
+                <Button
+                  variant="outline"
+                  className="w-full border-slate-600 text-slate-200"
+                >
                   Login
                 </Button>
               </Link>
@@ -82,7 +95,8 @@ export default function Index() {
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">For Sellers</h2>
             <p className="text-slate-400 mb-6">
-              Create your shop, add products, manage inventory, and reach thousands of customers instantly.
+              Create your shop, add products, manage inventory, and reach
+              thousands of customers instantly.
             </p>
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-2 text-slate-300">
@@ -105,7 +119,10 @@ export default function Index() {
                 </Button>
               </Link>
               <Link to="/seller/login" className="flex-1">
-                <Button variant="outline" className="w-full border-slate-600 text-slate-200">
+                <Button
+                  variant="outline"
+                  className="w-full border-slate-600 text-slate-200"
+                >
                   Login
                 </Button>
               </Link>
@@ -115,7 +132,9 @@ export default function Index() {
 
         {/* Features Section */}
         <div className="bg-slate-800/30 border border-slate-700 rounded-xl p-8 backdrop-blur-sm">
-          <h3 className="text-2xl font-bold text-white mb-8 text-center">Why Choose ShopHub?</h3>
+          <h3 className="text-2xl font-bold text-white mb-8 text-center">
+            Why Choose ShopHub?
+          </h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="text-4xl font-bold text-blue-400 mb-2">100%</div>
@@ -126,7 +145,9 @@ export default function Index() {
               <p className="text-slate-300">Platform Available</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-purple-400 mb-2">10K+</div>
+              <div className="text-4xl font-bold text-purple-400 mb-2">
+                10K+
+              </div>
               <p className="text-slate-300">Active Products</p>
             </div>
           </div>
@@ -135,10 +156,17 @@ export default function Index() {
 
       {/* CTA Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <h2 className="text-3xl font-bold text-white mb-4">Start Shopping Today</h2>
-        <p className="text-slate-300 mb-8">Browse our collection or list your products</p>
+        <h2 className="text-3xl font-bold text-white mb-4">
+          Start Shopping Today
+        </h2>
+        <p className="text-slate-300 mb-8">
+          Browse our collection or list your products
+        </p>
         <Link to="/products">
-          <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+          >
             Explore Products
           </Button>
         </Link>

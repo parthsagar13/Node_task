@@ -66,9 +66,13 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Please log in to view products</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Please log in to view products
+          </h2>
           <Link to="/user/login">
-            <Button className="bg-blue-500 hover:bg-blue-600">Login as Customer</Button>
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              Login as Customer
+            </Button>
           </Link>
         </div>
       </div>
@@ -87,9 +91,13 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Product not found</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Product not found
+          </h2>
           <Link to="/products">
-            <Button className="bg-blue-500 hover:bg-blue-600">Back to Products</Button>
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              Back to Products
+            </Button>
           </Link>
         </div>
       </div>
@@ -101,7 +109,10 @@ export default function ProductDetail() {
       {/* Header */}
       <div className="bg-slate-900/50 backdrop-blur-md border-b border-slate-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link to="/products" className="flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <Link
+            to="/products"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-200"
+          >
             <ArrowLeft className="w-4 h-4" />
             Back to Products
           </Link>
@@ -124,8 +135,12 @@ export default function ProductDetail() {
               {/* Product Info */}
               <div className="space-y-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-white mb-2">{product.name}</h1>
-                  <p className="text-slate-300 text-sm">Shop: {product.shop_name || "Unknown"}</p>
+                  <h1 className="text-3xl font-bold text-white mb-2">
+                    {product.name}
+                  </h1>
+                  <p className="text-slate-300 text-sm">
+                    Shop: {product.shop_name || "Unknown"}
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -144,9 +159,15 @@ export default function ProductDetail() {
                   </div>
 
                   <div>
-                    <p className="text-slate-400 text-sm mb-1">Stock Available</p>
-                    <p className={`text-lg font-semibold ${product.stock > 0 ? "text-green-400" : "text-red-400"}`}>
-                      {product.stock > 0 ? `${product.stock} items` : "Out of stock"}
+                    <p className="text-slate-400 text-sm mb-1">
+                      Stock Available
+                    </p>
+                    <p
+                      className={`text-lg font-semibold ${product.stock > 0 ? "text-green-400" : "text-red-400"}`}
+                    >
+                      {product.stock > 0
+                        ? `${product.stock} items`
+                        : "Out of stock"}
                     </p>
                   </div>
                 </div>
@@ -154,13 +175,19 @@ export default function ProductDetail() {
                 {product.stock > 0 && (
                   <div className="space-y-4">
                     <div>
-                      <label className="text-slate-300 text-sm block mb-2">Quantity</label>
+                      <label className="text-slate-300 text-sm block mb-2">
+                        Quantity
+                      </label>
                       <Input
                         type="number"
                         min="1"
                         max={product.stock}
                         value={quantity}
-                        onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                        onChange={(e) =>
+                          setQuantity(
+                            Math.max(1, parseInt(e.target.value) || 1),
+                          )
+                        }
                         className="bg-slate-700 border-slate-600 text-white"
                       />
                     </div>

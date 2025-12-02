@@ -29,7 +29,12 @@ export default function AddProduct() {
     setLoading(true);
 
     try {
-      await createProduct(name, description, parseFloat(price), parseInt(stock));
+      await createProduct(
+        name,
+        description,
+        parseFloat(price),
+        parseInt(stock),
+      );
       toast.success("Product added successfully!");
       navigate("/seller/dashboard");
     } catch (error: any) {
@@ -43,9 +48,13 @@ export default function AddProduct() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Please log in as seller</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Please log in as seller
+          </h2>
           <Link to="/seller/login">
-            <Button className="bg-cyan-500 hover:bg-cyan-600">Seller Login</Button>
+            <Button className="bg-cyan-500 hover:bg-cyan-600">
+              Seller Login
+            </Button>
           </Link>
         </div>
       </div>
@@ -71,7 +80,9 @@ export default function AddProduct() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-white">Add New Product</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white">
+              Add New Product
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -140,7 +151,9 @@ export default function AddProduct() {
 
               <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
                 <p className="text-slate-300 text-sm">
-                  <span className="font-semibold">Note:</span> Your product will be visible to all customers once added. Make sure all information is accurate.
+                  <span className="font-semibold">Note:</span> Your product will
+                  be visible to all customers once added. Make sure all
+                  information is accurate.
                 </p>
               </div>
 

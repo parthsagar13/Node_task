@@ -40,9 +40,13 @@ export default function Products() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Please log in to view products</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Please log in to view products
+          </h2>
           <Link to="/user/login">
-            <Button className="bg-blue-500 hover:bg-blue-600">Login as Customer</Button>
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              Login as Customer
+            </Button>
           </Link>
         </div>
       </div>
@@ -61,17 +65,21 @@ export default function Products() {
             <h1 className="text-2xl font-bold text-white">Products</h1>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-slate-300 text-sm">
-              Welcome, {user.name}
-            </div>
+            <div className="text-slate-300 text-sm">Welcome, {user.name}</div>
             <Link to="/cart">
-              <Button variant="outline" className="border-slate-600 text-slate-200">
+              <Button
+                variant="outline"
+                className="border-slate-600 text-slate-200"
+              >
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 Cart
               </Button>
             </Link>
             <Link to="/orders">
-              <Button variant="outline" className="border-slate-600 text-slate-200">
+              <Button
+                variant="outline"
+                className="border-slate-600 text-slate-200"
+              >
                 Orders
               </Button>
             </Link>
@@ -106,8 +114,17 @@ export default function Products() {
                         Shop: {product.shop_name || "Unknown"}
                       </p>
                       <p className="text-slate-300">
-                        Stock: <span className={product.stock > 0 ? "text-green-400" : "text-red-400"}>
-                          {product.stock > 0 ? `${product.stock} available` : "Out of stock"}
+                        Stock:{" "}
+                        <span
+                          className={
+                            product.stock > 0
+                              ? "text-green-400"
+                              : "text-red-400"
+                          }
+                        >
+                          {product.stock > 0
+                            ? `${product.stock} available`
+                            : "Out of stock"}
                         </span>
                       </p>
                     </div>
@@ -115,7 +132,10 @@ export default function Products() {
                       <span className="text-xl font-bold text-blue-400">
                         ${product.price.toFixed(2)}
                       </span>
-                      <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
+                      <Button
+                        size="sm"
+                        className="bg-blue-500 hover:bg-blue-600"
+                      >
                         View Details
                       </Button>
                     </div>
