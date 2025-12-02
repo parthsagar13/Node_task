@@ -171,7 +171,7 @@ export async function getOrderById(orderId: string) {
 export async function updatePaymentStatus(orderId: string, status: 'success' | 'failed') {
   return apiCall(`/orders/payment/${orderId}`, {
     method: 'PUT',
-    body: JSON.stringify({ order_id: orderId, status }),
+    body: JSON.stringify({ status }),
   });
 }
 
