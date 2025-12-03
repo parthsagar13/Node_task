@@ -1,16 +1,22 @@
 const API_BASE = "/api";
 
+// Storage helpers (defined first so they can be used by other functions)
+export function getStoredUser() {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+}
+
+export function getStoredSeller() {
+  const seller = localStorage.getItem("seller");
+  return seller ? JSON.parse(seller) : null;
+}
+
 export async function apiCall(endpoint: string, options: RequestInit = {}) {
   const url = `${API_BASE}${endpoint}`;
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...options.headers,
   };
-
-  const token = localStorage.getItem("token");
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
 
   const response = await fetch(url, {
     ...options,
@@ -36,8 +42,7 @@ export async function userRegister(
     method: "POST",
     body: JSON.stringify({ name, email, password }),
   });
-  if (data.token) {
-    localStorage.setItem("token", data.token);
+  if (data.user) {
     localStorage.setItem("user", JSON.stringify(data.user));
   }
   return data;
@@ -48,8 +53,7 @@ export async function userLogin(email: string, password: string) {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
-  if (data.token) {
-    localStorage.setItem("token", data.token);
+  if (data.user) {
     localStorage.setItem("user", JSON.stringify(data.user));
   }
   return data;
@@ -65,8 +69,7 @@ export async function sellerRegister(
     method: "POST",
     body: JSON.stringify({ name, email, password, shop_name }),
   });
-  if (data.token) {
-    localStorage.setItem("seller_token", data.token);
+  if (data.seller) {
     localStorage.setItem("seller", JSON.stringify(data.seller));
   }
   return data;
@@ -77,8 +80,7 @@ export async function sellerLogin(email: string, password: string) {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
-  if (data.token) {
-    localStorage.setItem("seller_token", data.token);
+  if (data.seller) {
     localStorage.setItem("seller", JSON.stringify(data.seller));
   }
   return data;
@@ -94,7 +96,9 @@ export async function getProductById(id: string) {
 }
 
 export async function getSellerProducts() {
-  return apiCall("/products/my-products", { method: "GET" });
+  const seller = getStoredSeller();
+  const sellerId = seller?.id || '';
+  return apiCall(`/products/my-products?seller_id=${sellerId}`, { method: "GET" });
 }
 
 export async function createProduct(
@@ -103,54 +107,54 @@ export async function createProduct(
   price: number,
   stock: number,
 ) {
+  const seller = getStoredSeller();
   return apiCall("/products/add", {
     method: "POST",
-    body: JSON.stringify({ name, description, price, stock }),
+    body: JSON.stringify({ name, description, price, stock, seller_id: seller?.id }),
   });
 }
 
 export async function updateProductStock(id: string, stock: number) {
+  const seller = getStoredSeller();
   return apiCall(`/products/${id}/stock`, {
     method: "PUT",
-    body: JSON.stringify({ stock }),
+    body: JSON.stringify({ stock, seller_id: seller?.id }),
   });
 }
 
 // Cart endpoints
 export async function getCart() {
-  return apiCall("/cart/items", { method: "GET" });
+  const user = getStoredUser();
+  const userId = user?.id || '';
+  return apiCall(`/cart/items?user_id=${userId}`, { method: "GET" });
 }
 
 export async function addToCart(product_id: string, quantity: number) {
+  const user = getStoredUser();
   return apiCall("/cart/add", {
     method: "POST",
-    body: JSON.stringify({ product_id, quantity }),
+    body: JSON.stringify({ product_id, quantity, user_id: user?.id }),
   });
 }
 
 export async function updateCartItem(cartId: string, quantity: number) {
+  const user = getStoredUser();
   return apiCall(`/cart/${cartId}`, {
     method: "PUT",
-    body: JSON.stringify({ quantity }),
+    body: JSON.stringify({ quantity, user_id: user?.id }),
   });
 }
 
 export async function removeFromCart(cartId: string) {
-  return apiCall(`/cart/${cartId}`, { method: "DELETE" });
+  const user = getStoredUser();
+  const userId = user?.id || '';
+  return apiCall(`/cart/${cartId}?user_id=${userId}`, { method: "DELETE" });
 }
 
 export async function clearCart() {
-  return apiCall("/cart", { method: "DELETE" });
-}
-
-export async function calculateTotal(
-  coupon_code?: string,
-  wallet_points_used?: number,
-) {
-  return apiCall("/cart/calculate-total", {
-    method: "POST",
-    body: JSON.stringify({ coupon_code, wallet_points_used }),
-  });
+  const user = getStoredUser();
+  const userId = user?.id || '';
+  return apiCall(`/cart?user_id=${userId}`, { method: "DELETE" });
 }
 
 // Order endpoints
@@ -158,18 +162,23 @@ export async function placeOrder(
   coupon_code?: string,
   wallet_points_used?: number,
 ) {
+  const user = getStoredUser();
   return apiCall("/orders/place", {
     method: "POST",
-    body: JSON.stringify({ coupon_code, wallet_points_used }),
+    body: JSON.stringify({ coupon_code, wallet_points_used, user_id: user?.id }),
   });
 }
 
 export async function getOrders() {
-  return apiCall("/orders", { method: "GET" });
+  const user = getStoredUser();
+  const userId = user?.id || '';
+  return apiCall(`/orders?user_id=${userId}`, { method: "GET" });
 }
 
 export async function getOrderById(orderId: string) {
-  return apiCall(`/orders/${orderId}`, { method: "GET" });
+  const user = getStoredUser();
+  const userId = user?.id || '';
+  return apiCall(`/orders/${orderId}?user_id=${userId}`, { method: "GET" });
 }
 
 export async function updatePaymentStatus(
@@ -182,22 +191,10 @@ export async function updatePaymentStatus(
   });
 }
 
-export function getStoredUser() {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
-}
-
-export function getStoredSeller() {
-  const seller = localStorage.getItem("seller");
-  return seller ? JSON.parse(seller) : null;
-}
-
 export function logout() {
-  localStorage.removeItem("token");
   localStorage.removeItem("user");
 }
 
 export function sellerLogout() {
-  localStorage.removeItem("seller_token");
   localStorage.removeItem("seller");
 }

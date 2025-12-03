@@ -63,7 +63,6 @@ export default function SellerDashboard() {
           <Button
             variant="outline"
             onClick={() => {
-              localStorage.removeItem("seller_token");
               localStorage.removeItem("seller");
               navigate("/seller/login");
             }}
@@ -170,7 +169,7 @@ export default function SellerDashboard() {
                         <div>
                           <p className="text-slate-400">Price</p>
                           <p className="text-blue-400 font-semibold">
-                            ${product.price.toFixed(2)}
+                            ${product?.price?.toFixed(2)}
                           </p>
                         </div>
                         <div>

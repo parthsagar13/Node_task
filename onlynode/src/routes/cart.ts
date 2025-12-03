@@ -9,25 +9,22 @@ import {
 
 const router = Router();
 
-// Default user ID for routes that previously required authentication
-const DEFAULT_USER_ID = "default-user-id";
-
-// Add to Cart
-router.post("/add", validateRequest(cartItemSchema), (async (
-  req,
-  res,
-) => {
+router.post("/add", validateRequest(cartItemSchema), (async (req, res) => {
   try {
     const { product_id, quantity, user_id } = req.body;
-    const userId = user_id || DEFAULT_USER_ID;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
-      // Check if product exists
       const [products] = await connection.execute(
         "SELECT * FROM products WHERE id = ?",
-        [product_id],
+        [product_id]
       );
 
       if ((products as any[]).length === 0) {
@@ -36,25 +33,22 @@ router.post("/add", validateRequest(cartItemSchema), (async (
           .json({ success: false, message: "Product not found" });
       }
 
-      // Check if item already in cart
       const [existingCart] = await connection.execute(
         "SELECT * FROM cart WHERE user_id = ? AND product_id = ?",
-        [userId, product_id],
+        [user_id, product_id]
       );
 
       if ((existingCart as any[]).length > 0) {
-        // Update quantity
         const cartItem = (existingCart as any[])[0];
         await connection.execute(
           "UPDATE cart SET quantity = quantity + ? WHERE id = ?",
-          [quantity, cartItem.id],
+          [quantity, cartItem.id]
         );
       } else {
-        // Add new cart item
         const cartId = uuidv4();
         await connection.execute(
           "INSERT INTO cart (id, user_id, product_id, quantity) VALUES (?, ?, ?, ?)",
-          [cartId, userId, product_id, quantity],
+          [cartId, user_id, product_id, quantity]
         );
       }
 
@@ -73,19 +67,25 @@ router.post("/add", validateRequest(cartItemSchema), (async (
   }
 }) as RequestHandler);
 
-// Get Cart Items
 router.get("/items", (async (req, res) => {
   try {
-    const userId = req.query.user_id || DEFAULT_USER_ID;
+    const user_id = req.query.user_id;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
+
     const connection = await pool.getConnection();
 
     try {
       const [cartItems] = await connection.execute(
         `SELECT c.*, p.name, p.price, p.stock FROM cart c
-           JOIN products p ON c.product_id = p.id
-           WHERE c.user_id = ?
-           ORDER BY c.created_at DESC`,
-        [userId],
+         JOIN products p ON c.product_id = p.id
+         WHERE c.user_id = ?
+         ORDER BY c.created_at DESC`,
+        [user_id]
       );
 
       res.json({
@@ -101,23 +101,26 @@ router.get("/items", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Update Cart Item Quantity
 router.put("/:cartId", validateRequest(updateCartItemSchema), (async (
   req,
-  res,
+  res
 ) => {
   try {
     const { cartId } = req.params;
     const { quantity, user_id } = req.body;
-    const userId = user_id || DEFAULT_USER_ID;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
-      // Verify cart item belongs to user
       const [cartItems] = await connection.execute(
         "SELECT * FROM cart WHERE id = ? AND user_id = ?",
-        [cartId, userId],
+        [cartId, user_id]
       );
 
       if ((cartItems as any[]).length === 0) {
@@ -144,19 +147,23 @@ router.put("/:cartId", validateRequest(updateCartItemSchema), (async (
   }
 }) as RequestHandler);
 
-// Remove from Cart
 router.delete("/:cartId", (async (req, res) => {
   try {
     const { cartId } = req.params;
-    const userId = req.query.user_id || DEFAULT_USER_ID;
+    const user_id = req.query.user_id;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
-      // Verify cart item belongs to user
       const [cartItems] = await connection.execute(
         "SELECT * FROM cart WHERE id = ? AND user_id = ?",
-        [cartId, userId],
+        [cartId, user_id]
       );
 
       if ((cartItems as any[]).length === 0) {
@@ -182,21 +189,24 @@ router.delete("/:cartId", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Get Cart Total with Discount
 router.post("/calculate-total", (async (req, res) => {
   try {
     const { coupon_code, wallet_points_used, user_id } = req.body;
-    const userId = user_id || DEFAULT_USER_ID;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
-      // Get cart items
       const [cartItems] = await connection.execute(
         `SELECT c.*, p.price FROM cart c
-           JOIN products p ON c.product_id = p.id
-           WHERE c.user_id = ?`,
-        [userId],
+         JOIN products p ON c.product_id = p.id
+         WHERE c.user_id = ?`,
+        [user_id]
       );
 
       if ((cartItems as any[]).length === 0) {
@@ -209,7 +219,6 @@ router.post("/calculate-total", (async (req, res) => {
         });
       }
 
-      // Calculate subtotal
       let subtotal = 0;
       (cartItems as any[]).forEach((item: any) => {
         subtotal += item.price * item.quantity;
@@ -217,13 +226,12 @@ router.post("/calculate-total", (async (req, res) => {
 
       let discountAmount = 0;
 
-      // Apply coupon if provided
       if (coupon_code) {
         const [coupons] = await connection.execute(
           `SELECT c.* FROM coupons c
-             JOIN user_coupons uc ON c.id = uc.coupon_id
-             WHERE c.code = ? AND uc.user_id = ? AND (c.valid_until IS NULL OR c.valid_until > NOW())`,
-          [coupon_code, userId],
+           JOIN user_coupons uc ON c.id = uc.coupon_id
+           WHERE c.code = ? AND uc.user_id = ? AND (c.valid_until IS NULL OR c.valid_until > NOW())`,
+          [coupon_code, user_id]
         );
 
         if ((coupons as any[]).length > 0) {
@@ -232,12 +240,11 @@ router.post("/calculate-total", (async (req, res) => {
         }
       }
 
-      // Apply wallet points deduction
       let walletDeduction = 0;
       if (wallet_points_used && wallet_points_used > 0) {
         const [users] = await connection.execute(
           "SELECT wallet_points FROM users WHERE id = ?",
-          [userId],
+          [user_id]
         );
 
         const user = (users as any[])[0];
@@ -265,14 +272,20 @@ router.post("/calculate-total", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Clear Cart
 router.delete("/", (async (req, res) => {
   try {
-    const userId = req.query.user_id || DEFAULT_USER_ID;
+    const user_id = req.query.user_id;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
+
     const connection = await pool.getConnection();
 
     try {
-      await connection.execute("DELETE FROM cart WHERE user_id = ?", [userId]);
+      await connection.execute("DELETE FROM cart WHERE user_id = ?", [user_id]);
 
       res.json({
         success: true,

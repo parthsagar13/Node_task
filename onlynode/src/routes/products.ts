@@ -5,26 +5,35 @@ import { productSchema, validateRequest } from "../middleware/validation";
 
 const router = Router();
 
-// Default seller ID for routes that previously required authentication
-const DEFAULT_SELLER_ID = "default-seller-id";
-
-// Create Product
-router.post("/add", validateRequest(productSchema), (async (
-  req,
-  res,
-) => {
+router.post("/add", validateRequest(productSchema), (async (req, res) => {
   try {
-    const { name, description, price, stock } = req.body;
-    const sellerId = req.body.seller_id || DEFAULT_SELLER_ID;
+    const { name, description, price, stock, seller_id } = req.body;
+
+    if (!seller_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "seller_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
+      const [sellers] = await connection.execute(
+        "SELECT id FROM sellers WHERE id = ?",
+        [seller_id]
+      );
+
+      if ((sellers as any[]).length === 0) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid seller_id. Seller does not exist." });
+      }
+
       const productId = uuidv4();
 
       await connection.execute(
         "INSERT INTO products (id, seller_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?, ?)",
-        [productId, sellerId, name, description, price, stock],
+        [productId, seller_id, name, description, price, stock]
       );
 
       res.status(201).json({
@@ -47,16 +56,22 @@ router.post("/add", validateRequest(productSchema), (async (
   }
 }) as RequestHandler);
 
-// Get Seller's Products
 router.get("/my-products", (async (req, res) => {
   try {
-    const sellerId = req.query.seller_id || DEFAULT_SELLER_ID;
+    const sellerId = req.query.seller_id;
+
+    if (!sellerId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "seller_id is required" });
+    }
+
     const connection = await pool.getConnection();
 
     try {
       const [products] = await connection.execute(
         "SELECT * FROM products WHERE seller_id = ? ORDER BY created_at DESC",
-        [sellerId],
+        [sellerId]
       );
 
       res.json({
@@ -74,16 +89,15 @@ router.get("/my-products", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Get All Products (Public)
-router.get("/all", (async (req, res) => {
+router.get("/all", (async (_req, res) => {
   try {
     const connection = await pool.getConnection();
 
     try {
       const [products] = await connection.execute(
         `SELECT p.*, s.shop_name FROM products p 
-           LEFT JOIN sellers s ON p.seller_id = s.id 
-           ORDER BY p.created_at DESC`,
+         LEFT JOIN sellers s ON p.seller_id = s.id 
+         ORDER BY p.created_at DESC`
       );
 
       res.json({
@@ -101,7 +115,6 @@ router.get("/all", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Get Product by ID
 router.get("/:id", (async (req, res) => {
   try {
     const { id } = req.params;
@@ -110,9 +123,9 @@ router.get("/:id", (async (req, res) => {
     try {
       const [products] = await connection.execute(
         `SELECT p.*, s.shop_name FROM products p 
-           LEFT JOIN sellers s ON p.seller_id = s.id 
-           WHERE p.id = ?`,
-        [id],
+         LEFT JOIN sellers s ON p.seller_id = s.id 
+         WHERE p.id = ?`,
+        [id]
       );
 
       const product = (products as any[])[0];
@@ -138,14 +151,17 @@ router.get("/:id", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Update Product Stock
 router.put("/:id/stock", (async (req, res) => {
   try {
     const { id } = req.params;
-    const { stock } = req.body;
-    const sellerId = req.body.seller_id || DEFAULT_SELLER_ID;
+    const { stock, seller_id } = req.body;
 
-    // Validate stock
+    if (!seller_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "seller_id is required" });
+    }
+
     if (!Number.isInteger(stock) || stock < 0) {
       return res
         .status(400)
@@ -155,10 +171,9 @@ router.put("/:id/stock", (async (req, res) => {
     const connection = await pool.getConnection();
 
     try {
-      // Verify seller owns the product
       const [products] = await connection.execute(
         "SELECT * FROM products WHERE id = ? AND seller_id = ?",
-        [id, sellerId],
+        [id, seller_id]
       );
 
       if ((products as any[]).length === 0) {
@@ -185,19 +200,23 @@ router.put("/:id/stock", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Delete Product
 router.delete("/:id", (async (req, res) => {
   try {
     const { id } = req.params;
-    const sellerId = req.body.seller_id || DEFAULT_SELLER_ID;
+    const { seller_id } = req.body;
+
+    if (!seller_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "seller_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
-      // Verify seller owns the product
       const [products] = await connection.execute(
         "SELECT * FROM products WHERE id = ? AND seller_id = ?",
-        [id, sellerId],
+        [id, seller_id]
       );
 
       if ((products as any[]).length === 0) {

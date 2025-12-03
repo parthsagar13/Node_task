@@ -1,35 +1,28 @@
 import { Router, RequestHandler } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { pool } from "../config/database";
-import {
-  orderSchema,
-  paymentStatusSchema,
-  validateRequest,
-} from "../middleware/validation";
+import { orderSchema, validateRequest } from "../middleware/validation";
 
 const router = Router();
 
-// Default user ID for routes that previously required authentication
-const DEFAULT_USER_ID = "default-user-id";
-
-// Place Order
-router.post("/place", validateRequest(orderSchema), (async (
-  req,
-  res,
-) => {
+router.post("/place", validateRequest(orderSchema), (async (req, res) => {
   try {
     const { coupon_code, wallet_points_used, user_id } = req.body;
-    const userId = user_id || DEFAULT_USER_ID;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
-      // Get cart items
       const [cartItems] = await connection.execute(
         `SELECT c.*, p.price, p.stock FROM cart c
-           JOIN products p ON c.product_id = p.id
-           WHERE c.user_id = ?`,
-        [userId],
+         JOIN products p ON c.product_id = p.id
+         WHERE c.user_id = ?`,
+        [user_id]
       );
 
       if ((cartItems as any[]).length === 0) {
@@ -38,7 +31,6 @@ router.post("/place", validateRequest(orderSchema), (async (
           .json({ success: false, message: "Cart is empty" });
       }
 
-      // Check stock availability
       for (const item of cartItems as any[]) {
         if (item.quantity > item.stock) {
           return res.status(400).json({
@@ -48,7 +40,6 @@ router.post("/place", validateRequest(orderSchema), (async (
         }
       }
 
-      // Calculate totals
       let subtotal = 0;
       (cartItems as any[]).forEach((item: any) => {
         subtotal += item.price * item.quantity;
@@ -56,13 +47,12 @@ router.post("/place", validateRequest(orderSchema), (async (
 
       let discountAmount = 0;
 
-      // Apply coupon if provided
       if (coupon_code) {
         const [coupons] = await connection.execute(
           `SELECT c.* FROM coupons c
-             JOIN user_coupons uc ON c.id = uc.coupon_id
-             WHERE c.code = ? AND uc.user_id = ? AND (c.valid_until IS NULL OR c.valid_until > NOW())`,
-          [coupon_code, userId],
+           JOIN user_coupons uc ON c.id = uc.coupon_id
+           WHERE c.code = ? AND uc.user_id = ? AND (c.valid_until IS NULL OR c.valid_until > NOW())`,
+          [coupon_code, user_id]
         );
 
         if ((coupons as any[]).length > 0) {
@@ -71,12 +61,11 @@ router.post("/place", validateRequest(orderSchema), (async (
         }
       }
 
-      // Apply wallet points deduction
       let walletPointsUsed = 0;
       if (wallet_points_used && wallet_points_used > 0) {
         const [users] = await connection.execute(
           "SELECT wallet_points FROM users WHERE id = ?",
-          [userId],
+          [user_id]
         );
 
         const user = (users as any[])[0];
@@ -85,53 +74,48 @@ router.post("/place", validateRequest(orderSchema), (async (
 
       const totalPrice = Math.max(
         0,
-        subtotal - discountAmount - walletPointsUsed,
+        subtotal - discountAmount - walletPointsUsed
       );
 
-      // Create order
       const orderId = uuidv4();
 
       await connection.execute(
         `INSERT INTO orders (id, user_id, total_price, discount_amount, wallet_points_used, coupon_code, payment_status)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           orderId,
-          userId,
+          user_id,
           totalPrice,
           discountAmount,
           walletPointsUsed,
           coupon_code || null,
           "pending",
-        ],
+        ]
       );
 
-      // Create order items and deduct stock
       for (const item of cartItems as any[]) {
         const orderItemId = uuidv4();
 
         await connection.execute(
           `INSERT INTO order_items (id, order_id, product_id, quantity, price)
-             VALUES (?, ?, ?, ?, ?)`,
-          [orderItemId, orderId, item.product_id, item.quantity, item.price],
+           VALUES (?, ?, ?, ?, ?)`,
+          [orderItemId, orderId, item.product_id, item.quantity, item.price]
         );
 
-        // Deduct stock
         await connection.execute(
           "UPDATE products SET stock = stock - ? WHERE id = ?",
-          [item.quantity, item.product_id],
+          [item.quantity, item.product_id]
         );
       }
 
-      // Deduct wallet points from user
       if (walletPointsUsed > 0) {
         await connection.execute(
           "UPDATE users SET wallet_points = wallet_points - ? WHERE id = ?",
-          [walletPointsUsed, userId],
+          [walletPointsUsed, user_id]
         );
       }
 
-      // Clear cart
-      await connection.execute("DELETE FROM cart WHERE user_id = ?", [userId]);
+      await connection.execute("DELETE FROM cart WHERE user_id = ?", [user_id]);
 
       res.status(201).json({
         success: true,
@@ -154,19 +138,23 @@ router.post("/place", validateRequest(orderSchema), (async (
   }
 }) as RequestHandler);
 
-// Get Order Details
 router.get("/:orderId", (async (req, res) => {
   try {
     const { orderId } = req.params;
-    const userId = req.query.user_id || DEFAULT_USER_ID;
+    const user_id = req.query.user_id;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
-      // Get order
       const [orders] = await connection.execute(
         "SELECT * FROM orders WHERE id = ? AND user_id = ?",
-        [orderId, userId],
+        [orderId, user_id]
       );
 
       if ((orders as any[]).length === 0) {
@@ -177,12 +165,11 @@ router.get("/:orderId", (async (req, res) => {
 
       const order = (orders as any[])[0];
 
-      // Get order items
       const [items] = await connection.execute(
         `SELECT oi.*, p.name FROM order_items oi
-           JOIN products p ON oi.product_id = p.id
-           WHERE oi.order_id = ?`,
-        [orderId],
+         JOIN products p ON oi.product_id = p.id
+         WHERE oi.order_id = ?`,
+        [orderId]
       );
 
       res.json({
@@ -201,20 +188,25 @@ router.get("/:orderId", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Get User Orders
 router.get("/", (async (req, res) => {
   try {
-    const userId = req.query.user_id || DEFAULT_USER_ID;
+    const user_id = req.query.user_id;
+
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user_id is required" });
+    }
 
     const connection = await pool.getConnection();
 
     try {
       const [orders] = await connection.execute(
         `SELECT id, total_price, discount_amount, wallet_points_used, payment_status, order_status, created_at
-           FROM orders
-           WHERE user_id = ?
-           ORDER BY created_at DESC`,
-        [userId],
+         FROM orders
+         WHERE user_id = ?
+         ORDER BY created_at DESC`,
+        [user_id]
       );
 
       res.json({
@@ -230,13 +222,11 @@ router.get("/", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Update Payment Status
 router.put("/payment/:orderId", (async (req, res) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
 
-    // Validate status
     if (!status || !["success", "failed"].includes(status)) {
       return res
         .status(400)
@@ -248,7 +238,7 @@ router.put("/payment/:orderId", (async (req, res) => {
     try {
       const [orders] = await connection.execute(
         "SELECT * FROM orders WHERE id = ?",
-        [orderId],
+        [orderId]
       );
 
       if ((orders as any[]).length === 0) {
@@ -265,31 +255,28 @@ router.put("/payment/:orderId", (async (req, res) => {
           .json({ success: false, message: "Order payment already processed" });
       }
 
-      // Update payment status
       await connection.execute(
         "UPDATE orders SET payment_status = ?, order_status = ? WHERE id = ?",
-        [status, status === "success" ? "processing" : "cancelled", orderId],
+        [status, status === "success" ? "processing" : "cancelled", orderId]
       );
 
       if (status === "failed") {
-        // Restore stock for failed orders
         const [items] = await connection.execute(
           "SELECT * FROM order_items WHERE order_id = ?",
-          [orderId],
+          [orderId]
         );
 
         for (const item of items as any[]) {
           await connection.execute(
             "UPDATE products SET stock = stock + ? WHERE id = ?",
-            [item.quantity, item.product_id],
+            [item.quantity, item.product_id]
           );
         }
 
-        // Restore wallet points
         if (order.wallet_points_used > 0) {
           await connection.execute(
             "UPDATE users SET wallet_points = wallet_points + ? WHERE id = ?",
-            [order.wallet_points_used, order.user_id],
+            [order.wallet_points_used, order.user_id]
           );
         }
       }
